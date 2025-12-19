@@ -59,6 +59,7 @@ if "model" in st.session_state:
 else:
     st.error("Model belum dilatih di sesi ini. Jalankan halaman Modeling dulu.")
     st.stop()
+
 eval_result = hasil_eval(model, X_test, y_test)
 
 # =====================================================

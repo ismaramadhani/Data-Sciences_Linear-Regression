@@ -95,7 +95,7 @@ df = load_data()
 
 # HAPUS KOLOM IDENTITAS (TERMASUK Country_Code)
 df_cleaned = df.drop(
-    columns=['Country', 'Year', 'Country Code', 'Country_Code'],
+    columns=['Country', 'Year', 'Country_Code'],
     errors='ignore'
 )
 
@@ -201,7 +201,7 @@ with st.container(border=True):
 #  CORRELATION HEATMAP
 # =========================
 with st.container(border=True):
-    st.subheader("9️8️⃣ Correlation Heatmap")
+    st.subheader("8️⃣ Correlation Heatmap")
 
     st.markdown("### 🔴 Before Log Transformation")
     fig1, ax1 = plt.subplots(figsize=(12, 7))
