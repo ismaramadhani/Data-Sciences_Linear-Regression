@@ -228,30 +228,30 @@ with st.container(border=True):
 # =========================
 # 8️⃣ PCA
 # =========================
-with st.container(border=True):
-    st.subheader("9️⃣ PCA (Principal Component Analysis)")
+# with st.container(border=True):
+#     st.subheader("9️⃣ PCA (Principal Component Analysis)")
 
-    X_pca = df_log.select_dtypes(include='number').dropna()
+#     X_pca = df_log.select_dtypes(include='number').dropna()
 
-    pca = PCA()
-    pca.fit(X_pca)
+#     pca = PCA()
+#     pca.fit(X_pca)
 
-    var = pca.explained_variance_ratio_
-    cum = np.cumsum(var)
+#     var = pca.explained_variance_ratio_
+#     cum = np.cumsum(var)
 
-    pca_df = pd.DataFrame({
-        'PC': [f'PC{i+1}' for i in range(len(var))],
-        'Explained Variance': var,
-        'Cumulative Variance': cum
-    })
+#     pca_df = pd.DataFrame({
+#         'PC': [f'PC{i+1}' for i in range(len(var))],
+#         'Explained Variance': var,
+#         'Cumulative Variance': cum
+#     })
 
-    st.dataframe(pca_df)
+#     st.dataframe(pca_df)
 
-    fig, ax = plt.subplots(figsize=(10, 5))
-    ax.plot(range(1, len(var) + 1), var, marker='o', label='Explained Variance')
-    ax.plot(range(1, len(var) + 1), cum, marker='x', label='Cumulative Variance')
-    ax.legend()
-    st.pyplot(fig)
+#     fig, ax = plt.subplots(figsize=(10, 5))
+#     ax.plot(range(1, len(var) + 1), var, marker='o', label='Explained Variance')
+#     ax.plot(range(1, len(var) + 1), cum, marker='x', label='Cumulative Variance')
+#     ax.legend()
+#     st.pyplot(fig)
 
 # =========================
 # 1️⃣0️⃣ EDA

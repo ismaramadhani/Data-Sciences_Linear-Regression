@@ -133,12 +133,11 @@ menggunakan model regresi linear yang telah dilatih.
 with st.form("prediction_form"):
     input_data = {}
 
-    # Buat input sesuai feature
     for feature in feature_names:
         input_data[feature] = st.number_input(
             label=f"Input {feature}",
             value=0.0,
-            format="%.4f"
+            format="%.2f"
         )
 
     submitted = st.form_submit_button("📈 Prediksi Produksi")
@@ -147,16 +146,12 @@ with st.form("prediction_form"):
 if submitted:
     input_df = pd.DataFrame([input_data])
 
-    # Pastikan urutan kolom sama
     input_df = input_df[X_train.columns]
 
-    # 🔥 LOG TRANSFORM INPUT (INI KUNCI)
     input_df_log = np.log1p(input_df)
 
-    # Prediksi (hasil masih log)
     prediction_log = model.predict(input_df_log)[0]
 
-    # Kembalikan ke skala asli
     prediction_real = np.expm1(prediction_log)
 
     st.success("✅ Prediksi berhasil dilakukan!")
