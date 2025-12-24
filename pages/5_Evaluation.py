@@ -1,4 +1,5 @@
 import streamlit as st
+import numpy as np
 
 # =============================
 # PAGE CONFIG (HARUS PALING ATAS)
@@ -62,6 +63,16 @@ else:
 
 eval_result = hasil_eval(model, X_test, y_test)
 
+y_pred_log = model.predict(X_test)
+
+y_test_real = np.expm1(y_test)
+y_pred_real = np.expm1(y_pred_log)
+
+# eval_result = hasil_eval(
+#     y_test_real,
+#     y_pred_real
+# )
+
 # =====================================================
 # SECTION 1: METRIC
 # =====================================================
@@ -110,6 +121,51 @@ st.dataframe(coef_df, use_container_width=True)
 st.markdown(f"**Intercept:** `{intercept:.4f}`")
 
 # =====================================================
+# SECTION 5: PREDIKSI PRODUKSI (USER INPUT)
+# =====================================================
+st.subheader("🔮 Prediksi Hasil Produksi")
+
+st.markdown("""
+Masukkan nilai variabel input untuk memprediksi hasil produksi pertanian
+menggunakan model regresi linear yang telah dilatih.
+""")
+
+with st.form("prediction_form"):
+    input_data = {}
+
+    # Buat input sesuai feature
+    for feature in feature_names:
+        input_data[feature] = st.number_input(
+            label=f"Input {feature}",
+            value=0.0,
+            format="%.4f"
+        )
+
+    submitted = st.form_submit_button("📈 Prediksi Produksi")
+
+
+if submitted:
+    input_df = pd.DataFrame([input_data])
+
+    # Pastikan urutan kolom sama
+    input_df = input_df[X_train.columns]
+
+    # 🔥 LOG TRANSFORM INPUT (INI KUNCI)
+    input_df_log = np.log1p(input_df)
+
+    # Prediksi (hasil masih log)
+    prediction_log = model.predict(input_df_log)[0]
+
+    # Kembalikan ke skala asli
+    prediction_real = np.expm1(prediction_log)
+
+    st.success("✅ Prediksi berhasil dilakukan!")
+    st.metric(
+        label="📊 Prediksi Produksi (Skala Asli)",
+        value=f"{prediction_real:.2f}"
+    )
+
+# =====================================================
 # SECTION 4: INTERPRETASI
 # =====================================================
 st.subheader("🧠 Interpretation")
@@ -122,3 +178,9 @@ st.markdown("""
 Berdasarkan hasil evaluasi, model regresi linear layak digunakan
 sebagai pendekatan awal dalam analisis produksi pertanian di Asia.
 """)
+
+# =====================================================
+# FOOTER
+# =====================================================
+st.divider()
+st.caption("Evaluation | Proyek Data Science Akademik")

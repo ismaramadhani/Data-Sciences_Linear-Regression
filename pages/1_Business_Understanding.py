@@ -367,6 +367,9 @@ st.info(
     "yang akan membahas karakteristik data secara teknis."
 )
 
+# =====================================================
+# FOOTER
+# =====================================================
 st.divider()
 st.caption("Business Understanding | Proyek Data Science Akademik")
 

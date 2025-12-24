@@ -372,7 +372,8 @@ st.markdown(
     """
 )
 
-# -------------------------
+# =====================================================
 # FOOTER
-# -------------------------
-st.caption("Tahap Data Understanding — Metodologi CRISP-DM")
+# =====================================================
+st.divider()
+st.caption("Data Understanding | Proyek Data Science Akademik")

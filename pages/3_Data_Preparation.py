@@ -280,4 +280,9 @@ df_log.to_csv(DATA_DIR / "data_prep_log.csv", index=False)
 
 st.success("Dataset hasil Data Preparation berhasil disimpan.")
 
+# =====================================================
+# FOOTER
+# =====================================================
+st.divider()
+st.caption("Data Preparation | Proyek Data Science Akademik")
     
