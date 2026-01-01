@@ -1,10 +1,8 @@
 import streamlit as st
 import pandas as pd
 from pathlib import Path
-import numpy as np
 
 from modules.modelling import modelling
-from modules.Eval import koefisien_regresi
 
 # =============================
 # PAGE CONFIG
@@ -45,8 +43,9 @@ st.markdown("""
 """)
 
 st.markdown("""
-Tahap **Modeling** bertujuan untuk membangun model regresi linear
-berdasarkan data yang telah melalui proses transformasi logaritmik.
+Tahap **Modeling** bertujuan untuk membangun **model regresi linear**
+guna memprediksi nilai **Produksi Pertanian (Production)** berdasarkan
+variabel-variabel numerik yang telah melalui proses **Data Preparation**.
 """)
 
 st.divider()
@@ -56,13 +55,13 @@ st.divider()
 # =====================================================
 st.subheader("1️⃣ Pemuatan Dataset")
 
-df_log = pd.read_csv(DATA_DIR / "data_prep_log.csv")
-st.success("Dataset hasil Data Preparation (log-transform) berhasil dimuat.")
+df = pd.read_csv(DATA_DIR / "data_prep_log.csv")
+st.success("Dataset hasil Data Preparation berhasil dimuat.")
 
 # Ringkasan dataset
 c1, c2, c3 = st.columns(3)
-c1.metric("Jumlah Data", df_log.shape[0])
-c2.metric("Jumlah Fitur", df_log.shape[1] - 1)
+c1.metric("Jumlah Data", df.shape[0])
+c2.metric("Jumlah Fitur", df.shape[1] - 1)
 c3.metric("Target", "Production")
 
 st.divider()
@@ -72,16 +71,16 @@ st.divider()
 # =====================================================
 st.subheader("2️⃣–5️⃣ Proses Modeling")
 
-model, X_train, X_test, y_train, y_test = modelling(df_log)
+model, X_train, X_test, y_train, y_test = modelling(df)
 
-# Simpan ke session
+# Simpan ke session state
 st.session_state["model"] = model
 st.session_state["X_train"] = X_train
 st.session_state["X_test"] = X_test
 st.session_state["y_train"] = y_train
 st.session_state["y_test"] = y_test
 
-st.success("Model regresi linear berhasil dilatih.")
+st.success("Model regresi linear berhasil dilatih menggunakan data training.")
 
 st.divider()
 
@@ -90,27 +89,28 @@ st.divider()
 # =====================================================
 st.subheader("6️⃣ Struktur Model")
 
-st.markdown("**Target (y):**")
-st.code(y_train.name)
+st.markdown("**Variabel Target (y):**")
+st.code("Production")
 
-st.markdown("**Fitur (X):**")
-st.code(", ".join(X_train.columns))
+st.markdown("**Variabel Fitur (X):**")
+st.code(", ".join(X_train.columns.tolist()))
 
-# Rasio data
 st.markdown("**Pembagian Data:**")
-st.write(f"- Data Latih : {len(X_train)} Data")
-st.write(f"- Data Uji   : {len(X_test)} Data")
+st.write(f"- Data Latih : {len(X_train)} baris")
+st.write(f"- Data Uji   : {len(X_test)} baris")
 st.write("- Rasio       : 80% Training – 20% Testing")
 
 st.divider()
+
 # =====================================================
-# 6. TAMPILAN DATA LATIH & UJI
+# 7. DATA LATIH & DATA UJI
 # =====================================================
 st.subheader("7️⃣ Data Latih dan Data Uji")
 
 st.markdown("""
-Berikut adalah **ringkasan data yang digunakan dalam proses pelatihan dan pengujian model**.
-Ditampilkan 5 baris pertama untuk menjaga performa aplikasi.
+Berikut adalah **contoh data** yang digunakan dalam proses pelatihan dan
+pengujian model regresi linear. Ditampilkan **5 baris pertama** untuk
+menjaga performa aplikasi.
 """)
 
 # ---------- DATA TRAIN ----------
@@ -143,4 +143,4 @@ with col4:
 # FOOTER
 # =====================================================
 st.divider()
-st.caption("Modelling | Proyek Data Science Akademik")
+st.caption("Modeling | Proyek Data Science Akademik")

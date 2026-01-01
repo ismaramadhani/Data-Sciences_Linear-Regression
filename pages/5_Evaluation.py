@@ -1,20 +1,29 @@
+import joblib
 import streamlit as st
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+from joblib import load
+from sklearn.model_selection import train_test_split
+
+from modules.Eval import hasil_eval, visual_eval, koefisien_regresi
 
 # =============================
-# PAGE CONFIG (HARUS PALING ATAS)
+# PAGE CONFIG
 # =============================
 st.set_page_config(
     page_title="Evaluation - Linear Regression",
     layout="wide"
 )
 
-import pandas as pd
-import matplotlib.pyplot as plt
-from pathlib import Path
-
-from modules.modelling import modelling
-from modules.Eval import hasil_eval, visual_eval, koefisien_regresi
+# =====================================================
+# PATH
+# =====================================================
+BASE_DIR = Path(__file__).resolve().parents[1]
+DATA_DIR = BASE_DIR / "data"
+CURRENT_DIR = Path(__file__).resolve().parent
+MODEL_PATH = CURRENT_DIR / "linear_regression_model.joblib"
 
 # =====================================================
 # SIDEBAR
@@ -48,30 +57,28 @@ menggunakan metrik error dan visualisasi hasil prediksi.
 st.divider()
 
 # =====================================================
-# LOAD MODEL & DATA FROM SESSION STATE
+# LOAD MODEL (JOBLIB)
 # =====================================================
 
-if "model" in st.session_state:
-    model = st.session_state["model"]
-    X_test = st.session_state["X_test"]
-    y_test = st.session_state["y_test"]
-    X_train = st.session_state["X_train"]
+bundle = joblib.load(MODEL_PATH)
 
-else:
-    st.error("Model belum dilatih di sesi ini. Jalankan halaman Modeling dulu.")
-    st.stop()
+model = bundle["model"]
+X_test = bundle["X_test"]
+y_test = bundle["y_test"]
+X_train = bundle["X_train"]
+y_train = bundle["y_train"]
+feature_names = bundle["feature_names"]
 
+# =====================================================
+# EVALUATION
+# =====================================================
 eval_result = hasil_eval(model, X_test, y_test)
 
 y_pred_log = model.predict(X_test)
 
+# Konversi ke skala asli
 y_test_real = np.expm1(y_test)
 y_pred_real = np.expm1(y_pred_log)
-
-# eval_result = hasil_eval(
-#     y_test_real,
-#     y_pred_real
-# )
 
 # =====================================================
 # SECTION 1: METRIC
@@ -114,20 +121,19 @@ with col2:
 # =====================================================
 st.subheader("📐 Koefisien Regresi")
 
-feature_names = X_train.columns.tolist()
 coef_df, intercept = koefisien_regresi(model, feature_names)
 
 st.dataframe(coef_df, use_container_width=True)
 st.markdown(f"**Intercept:** `{intercept:.4f}`")
 
 # =====================================================
-# SECTION 5: PREDIKSI PRODUKSI (USER INPUT)
+# SECTION 4: PREDIKSI HASIL PRODUKSI
 # =====================================================
 st.subheader("🔮 Prediksi Hasil Produksi")
 
 st.markdown("""
-Masukkan nilai variabel input untuk memprediksi hasil produksi pertanian
-menggunakan model regresi linear yang telah dilatih.
+Masukkan nilai variabel input **dalam skala asli**.
+Sistem akan melakukan transformasi logaritmik secara otomatis.
 """)
 
 with st.form("prediction_form"):
@@ -136,17 +142,17 @@ with st.form("prediction_form"):
     for feature in feature_names:
         input_data[feature] = st.number_input(
             label=f"Input {feature}",
+            min_value=0.0,
             value=0.0,
             format="%.2f"
         )
 
     submitted = st.form_submit_button("📈 Prediksi Produksi")
 
-
 if submitted:
-    input_df = pd.DataFrame([input_data])
 
-    input_df = input_df[X_train.columns]
+    input_df = pd.DataFrame([input_data])
+    input_df = input_df[feature_names]
 
     input_df_log = np.log1p(input_df)
 
@@ -161,13 +167,13 @@ if submitted:
     )
 
 # =====================================================
-# SECTION 4: INTERPRETASI
+# SECTION 5: INTERPRETASI
 # =====================================================
 st.subheader("🧠 Interpretation")
 
 st.markdown("""
 - **MAE dan RMSE rendah** menunjukkan kesalahan prediksi relatif kecil  
-- **Nilai R² mendekati 1** menandakan model mampu menjelaskan variasi produksi pertanian  
+- **Nilai R² mendekati 1** menandakan model mampu menjelaskan variasi produksi  
 - **Residual menyebar di sekitar nol** menunjukkan model tidak bias secara sistematis  
 
 Berdasarkan hasil evaluasi, model regresi linear layak digunakan

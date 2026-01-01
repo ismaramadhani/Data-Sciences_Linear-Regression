@@ -1,39 +1,18 @@
-# modules/modelling.py
-
-import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
 
-def modelling(df_log):
+def modelling(df):
 
-    # =============================
-    # 1. PISAH FITUR & TARGET
-    # =============================
-    X = df_log.drop(columns=['Production'])
-    y = df_log["Production"]
+    X = df.drop(columns=["Production", "Country", "Year"], errors="ignore")
+    y = df["Production"]
 
-    # =============================
-    # 2. SPLIT DATA
-    # =============================
     X_train, X_test, y_train, y_test = train_test_split(
         X, y,
         test_size=0.2,
         random_state=42
     )
 
-    # =============================
-    # 3. PIPELINE (IMPUTER + MODEL)
-    # =============================
-    pipeline = Pipeline(steps=[
-        ("imputer", SimpleImputer(strategy="mean")),
-        ("model", LinearRegression())
-    ])
+    model = LinearRegression()
+    model.fit(X_train, y_train)
 
-    # =============================
-    # 4. TRAINING
-    # =============================
-    pipeline.fit(X_train, y_train)
-
-    return pipeline, X_train, X_test, y_train, y_test
+    return model, X_train, X_test, y_train, y_test
